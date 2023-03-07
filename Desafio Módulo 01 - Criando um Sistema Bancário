@@ -1,0 +1,67 @@
+saldo = 1000.00
+extrato = ""
+LIMITE = 500
+numero_saques = 0
+LIMITE_SAQUES = 3
+
+
+menu = ("""
+################# MENU ####################
+[s] Sacar
+[d] Depositar
+[e] Extrato
+[s] Sair
+Digite por gentileza a transação desejada: """)
+
+while True:
+
+    transacao = (input(menu))
+
+    if transacao == "s":
+
+        saque = int(input("Digite o valor que deseja sacar: "))
+
+        excedeu_saldo = saque > saldo
+        excedeu_limite = saque > LIMITE
+        excedeu_saques = numero_saques > LIMITE_SAQUES
+                    
+        if excedeu_saldo:
+            print("Saldo insuficiente para concluir a transação.")  
+            
+        elif excedeu_limite:
+            print("Valor do saque superior ao permitido.")
+            
+        elif excedeu_saques:
+            print("Você ultrapassou o número de saques permitidos no dia.")
+
+        elif saque > 0:
+            extrato += f"Saque: R$ {saque:.2f}\n"
+            numero_saques += 1
+            saldo -= saque            
+            print(f"Saque efetuado com sucesso. Seu novo saldo é {saldo}")
+
+        else:
+            print("Operação falhou. Retorne ao menu principal")
+
+    elif transacao == "d":
+
+        deposito = int(input("Informe o valor a ser depositado e insira as cédulas no local indicado.."))
+
+        if deposito > 0: 
+            saldo += deposito
+            extrato += f"Depósito: R$ {deposito:.2f}\n"
+            print(f"Depósito realizado com sucesso... Seu novo saldo é: R$ {saldo}")
+        else:
+            "Erro na transação de depósito. Verifique se o valor a ser depositado foi preenchido corretamente"
+
+    elif transacao == "e":
+        print("\n############# EXTRATO BANCÁRIO #############")
+        print(f"[Saldo] R${float(saldo)}")
+        print("Não foram realizadas movimentações" if not extrato else extrato)
+
+    elif transacao == "s":
+        print("Obrigado por utilizar nossos canais de auto-atendimento. Tenha ume excelente dia.")
+        break
+        
+    else:
+        print("Opção incorreta, por favor selecione novamente a operação desejada!")
