@@ -1,0 +1,153 @@
+import textwrap
+
+def menu():
+    menu = ("""
+    ==================== MENU ====================
+    [1] Sacar
+    [2] Depositar
+    [3] Extrato
+    [4] Novo usuário
+    [5] Nova conta
+    [6] Listar Contas
+    [7] Sair
+    Digite por gentileza a transação desejada: """)
+
+    return (input(textwrap.dedent(menu)))
+
+def sacar(saque, extrato, numero_saques, saldo, LIMITE, LIMITE_SAQUES):
+    excedeu_saldo = saque > saldo
+    excedeu_limite = saque > LIMITE
+    excedeu_saques = numero_saques >= LIMITE_SAQUES
+                
+    if excedeu_saldo:
+        print("Saldo insuficiente para concluir a transação.")  
+        
+    elif excedeu_limite:
+        print("Valor do saque superior ao permitido.")
+        
+    elif excedeu_saques:
+        print("Você ultrapassou o número de saques permitidos no dia.")
+
+    elif saque > 0:
+        extrato += f"Saque: \t\tR$ {saque:.2f}\n"
+        numero_saques += 1
+        saldo -= saque            
+        print(f"Saque efetuado com sucesso. Seu novo saldo é {saldo}")
+
+    else:
+        print("Operação falhou. Retorne ao menu principal")
+
+    return saldo, extrato
+        
+def depositar(deposito, saldo, extrato):
+    if deposito > 0: 
+        saldo += deposito
+        extrato += f"Depósito: \tR$ {deposito:.2f}\n"
+        print(f"Depósito realizado com sucesso... Seu novo saldo é: R$ {saldo}")
+    else:
+        print("Erro na transação de depósito. Verifique se o valor a ser depositado foi preenchido corretamente")
+    return saldo, extrato 
+
+def exibir_extrato(saldo, extrato): 
+    print("\n============== EXTRATO BANCÁRIO ==============")
+    print("\nNão foram realizadas movimentações" if not extrato else extrato)
+    print(f"[Saldo] \tR${float(saldo)}")
+    
+def novo_usuario(usuarios):
+    cpf = input("Digite o seu CPF (somente os 11 números): ")
+    usuario = filtrar_usuario(cpf, usuarios)
+
+    if usuario:
+        print("\n Já existe um usuário com este CPF!")
+        return
+    
+    nome = input("Digite por gentileza o seu nome completo: ")
+    data_nascimento = input("Digite por gentileza a sua data de nascimento no formato DD-MM-AAAA: ")
+    endereco = input("Informe por gentileza o seu endereço (logradouro, nro - bairro - cidade/sigla estado)")
+
+    usuarios.append({"cpf": cpf, "nome": nome, "data_nascimento": data_nascimento, "endereco": endereco})
+    print("Usuário criado com sucesso")
+    
+def filtrar_usuario(cpf, usuarios):
+    usuarios_filtrados = [usuario for usuario in usuarios if usuario["cpf"] == cpf]
+
+    return usuarios_filtrados[0] if usuarios_filtrados else None
+
+def criar_conta(AGENCIA, numero_conta, usuarios):
+    cpf = input("Informe o seu CPF: ")
+    usuario = filtrar_usuario(cpf, usuarios)
+
+    if usuario:
+        print("\n== Conta Criada com Sucesso ==")
+        return{"agencia": AGENCIA, "numero_conta": numero_conta, "usuario": usuario}
+
+    print("\n== Usuário não localizado. Gentileza registrar usuário antes de iniciar uma nova conta ==")
+
+def listar_contas(contas):
+    for conta in contas:
+        linha = f"""
+        ======= LISTA DE C/C CADASTRADAS =======
+        Agência =\t {conta['agencia']}
+        C/C =\t\t {conta['numero_conta']}
+        Titular =\t {conta['usuario']}     
+        =========================================
+        """
+    print("=" * 100)
+    print(textwrap.dedent(linha))
+
+def main():
+    saldo = 1000.00
+    extrato = ""
+    LIMITE = 500
+    numero_saques = 0
+    LIMITE_SAQUES = 3
+    usuarios = []
+    contas = []
+    AGENCIA = "0001"
+
+    while True:
+
+        transacao = menu()
+
+        if transacao == "1":
+
+            saque = int(input("Digite o valor que deseja sacar: "))
+            saldo, extrato = sacar(
+                saque = saque, 
+                extrato = extrato, 
+                numero_saques = numero_saques,
+                saldo = saldo,
+                LIMITE = LIMITE,
+                LIMITE_SAQUES = LIMITE_SAQUES)
+            
+        elif transacao == "2":
+
+            deposito = int(input("Informe o valor a ser depositado e insira as cédulas no local indicado.."))
+
+            saldo, extrato = depositar(deposito, saldo, extrato)
+
+        elif transacao == "3":
+            exibir_extrato(saldo, extrato)
+
+        elif transacao == "4":
+            novo_usuario(usuarios)
+
+        elif transacao == "5":
+            numero_conta = len(contas) +1
+            conta = criar_conta(AGENCIA, numero_conta, usuarios)
+
+            if conta:
+                contas.append(conta)
+
+        elif transacao == "6":
+            listar_contas(contas)
+
+        elif transacao == "7":
+            print("Obrigado por utilizar nossos canais de auto-atendimento. Tenha ume excelente dia.")
+            break
+            
+        else:
+            print("Opção incorreta, por favor selecione novamente a operação desejada!")
+            
+main()
+
